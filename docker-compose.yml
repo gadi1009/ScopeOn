@@ -1,0 +1,39 @@
+
+
+
+services:
+  backend:
+    build:
+      context: ./coupon_management_app
+      dockerfile: Dockerfile
+    
+    volumes:
+      - ./coupon_management_app/backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/coupon_db
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=coupon_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+
+  frontend:
+    build:
+      context: ./coupon_management_app/frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./coupon_management_app/frontend:/app
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
