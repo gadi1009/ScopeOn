@@ -1,6 +1,9 @@
 
 from sqlalchemy.orm import Session
-from . import models, schemas
+from models import models
+from schemas import schemas
+from schemas import schemas
+from schemas import schemas
 
 def get_coupon(db: Session, coupon_id: int):
     return db.query(models.Coupon).filter(models.Coupon.id == coupon_id).first()

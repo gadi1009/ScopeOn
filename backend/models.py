@@ -1,6 +1,6 @@
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, Float
-from .database import Base
+from database import Base
 import datetime
 
 class Coupon(Base):
