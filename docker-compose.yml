@@ -4,11 +4,11 @@
 services:
   backend:
     build:
-      context: ./coupon_management_app
+      context: .
       dockerfile: Dockerfile
     
     volumes:
-      - ./coupon_management_app/backend:/app
+      - ./backend:/app
     ports:
       - "8000:8000"
     depends_on:
@@ -28,10 +28,10 @@ services:
 
   frontend:
     build:
-      context: ./coupon_management_app/frontend
+      context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - ./coupon_management_app/frontend:/app
+      - ./frontend:/app
     ports:
       - "3000:3000"
 
