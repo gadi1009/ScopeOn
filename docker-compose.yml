@@ -25,6 +25,11 @@ services:
       - POSTGRES_DB=coupon_db
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   frontend:
     build:

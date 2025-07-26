@@ -1,0 +1,31 @@
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for coupon in coupons %}
+    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ coupon.code }}</h3>
+        <p class="text-gray-600 mb-1">Discount: {{ coupon.discount_value }} {% if coupon.discount_type == "percentage" %}%{% else %}€{% endif %}</p>
+        <p class="text-gray-600 mb-1">Active: 
+            {% if coupon.active %}
+            <span class="text-green-500 font-medium">Yes</span>
+            {% else %}
+            <span class="text-red-500 font-medium">No</span>
+            {% endif %}
+        </p>
+        {% if coupon.valid_until %}
+        <p class="text-gray-600 mb-1">Valid Until: {{ coupon.valid_until.strftime('%Y-%m-%d %H:%M') }}</p>
+        {% else %}
+        <p class="text-gray-600 mb-1">Valid Until: N/A</p>
+        {% endif %}
+        <p class="text-gray-600 mb-1">Min. Purchase: {{ coupon.minimum_purchase_amount }}€</p>
+        <p class="text-gray-600 mb-4">Usage Limit: {{ coupon.usage_limit }} (Used: {{ coupon.times_used }})</p>
+        <div class="flex space-x-2">
+            <button hx-delete="http://localhost:8000/coupons/delete/{{ coupon.id }}" hx-confirm="Are you sure you want to delete coupon {{ coupon.code }}?" hx-target="#coupon-list" hx-swap="innerHTML" hx-on--after-request="htmx.trigger('#coupon-list', 'loadCoupons')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm transition-colors duration-300">
+                Delete
+            </button>
+            <!-- Add update button/form later -->
+        </div>
+    </div>
+    {% else %}
+    <p class="text-gray-600">No coupons available yet. Create one!</p>
+    {% endfor %}
+</div>

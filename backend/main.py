@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -13,6 +15,8 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+templates = Jinja2Templates(directory="backend/templates")
+
 app.include_router(coupons_router.router)
 
 # Dependency to get the database session
@@ -26,3 +30,10 @@ def get_db():
 @app.get("/")
 async def read_root():
     return {"message": "Welcome to the Coupon Management API!"}
+
+@app.get("/coupons/", response_model=List[schemas.Coupon])
+def read_coupons(request: Request, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    coupons = crud.get_coupons(db, skip=skip, limit=limit)
+    if "HX-Request" in request.headers:
+        return templates.TemplateResponse("coupon_list_partial.html", {"request": request, "coupons": coupons})
+    return coupons
