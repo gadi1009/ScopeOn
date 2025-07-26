@@ -1,11 +1,11 @@
-
 {
   "name": "frontend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch & npx http-server . -p 3000"
+    "build:css": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --config tailwind.config.js",
+    "start": "http-server . -p 3000"
   },
   "keywords": [],
   "author": "",

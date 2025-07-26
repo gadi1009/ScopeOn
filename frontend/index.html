@@ -1,98 +1,222 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CouponFlow - Modern Coupon Management</title>
+    <title>CouponFlow - Elevate Your Discounts</title>
     <link href="./dist/output.css" rel="stylesheet">
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
     <style>
         /* Custom styles for a more creative look */
         .hero-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%); /* Purple to Pink Gradient */
+            background-size: 200% 200%;
+            animation: gradient-animation 15s ease infinite;
+        }
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .card-gradient {
+            background: linear-gradient(145deg, var(--tw-gradient-stops));
+        }
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+        .animate-fade-in-down {
+            animation: fade-in-down 1.2s ease-out forwards;
+        }
+        .animate-fade-in-up {
+            animation: fade-in-up 1.2s ease-out forwards;
+        }
+        .animate-scale-in {
+            animation: scale-in 0.8s ease-out forwards;
+        }
+        @keyframes fade-in-down {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scale-in {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        /* Dark mode transitions */
+        body {
+            transition: background-color 0.6s ease, color 0.6s ease;
+        }
+        .bg-white, .shadow-lg, .border, .text-gray-800, .text-gray-700, .text-gray-600, .bg-gray-50, .bg-gray-100 {
+            transition: all 0.6s ease;
+        }
+        /* HTMX loading indicator */
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 300ms ease-in;
+        }
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+        .htmx-request.htmx-indicator {
+            opacity: 1;
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans leading-normal tracking-normal text-gray-800">
-    <nav class="bg-white p-4 shadow-md sticky top-0 z-50">
+<body class="bg-gray-50 font-sans leading-normal tracking-normal text-gray-800 dark:bg-gray-950 dark:text-gray-100">
+    <nav class="bg-white p-4 shadow-lg sticky top-0 z-50 dark:bg-gray-900 dark:shadow-2xl">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="#" class="text-blue-600 text-3xl font-extrabold">CouponFlow</a>
-            <div class="space-x-6">
-                <a href="#" class="text-gray-600 hover:text-blue-600 transition duration-300">Home</a>
-                <a href="#" class="text-gray-600 hover:text-blue-600 transition duration-300">Features</a>
-                <a href="#" class="text-gray-600 hover:text-blue-600 transition duration-300">Contact</a>
+            <a href="#" class="text-purple-600 text-4xl font-extrabold tracking-tight">Coupon<span class="text-pink-500">Flow</span></a>
+            <div class="flex items-center space-x-8">
+                <a href="#" class="text-gray-700 hover:text-purple-600 transition duration-300 text-lg font-medium dark:text-gray-300 dark:hover:text-purple-400">Dashboard</a>
+                <a href="#create-coupon" class="text-gray-700 hover:text-purple-600 transition duration-300 text-lg font-medium dark:text-gray-300 dark:hover:text-purple-400">Create</a>
+                <a href="#coupon-list-section" class="text-gray-700 hover:text-purple-600 transition duration-300 text-lg font-medium dark:text-gray-300 dark:hover:text-purple-400">View Coupons</a>
+                
+                <!-- Dark Mode Toggle -->
+                <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800 rounded-lg text-sm p-3 transition-colors duration-300">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.459 4.582a1 1 0 01-1.398.037l-2.393-2.466a1 1 0 01.037-1.398l2.466-2.393a1 1 0 011.398-.037l2.393 2.466a1 1 0 01-.037 1.398l-2.466 2.393zM10 18a1 1 0 01-1 1v1a1 1 0 112 0v-1a1 1 0 01-1-1zM3 10a1 1 0 011-1h1a1 1 0 110 2H4a1 1 0 01-1-1zM15 9a1 1 0 100 2h1a1 1 0 100-2h-1zM6.343 4.343a1 1 0 011.414 0l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 010-1.414zm1.414 11.314a1 1 0 010 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 0zM4.343 13.657a1 1 0 010-1.414l.707-.707a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414 0zm11.314-1.414a1 1 0 010 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 0z"></path></svg>
+                </button>
             </div>
         </div>
     </nav>
 
-    <header class="hero-bg text-white py-20 text-center shadow-inner">
-        <div class="container mx-auto">
-            <h1 class="text-6xl font-extrabold mb-4 animate-fade-in-down">Unlock the Power of Coupons</h1>
-            <p class="text-xl mb-8 opacity-90 animate-fade-in-up">Seamlessly manage, create, and track your discount codes with ease.</p>
-            <button class="bg-white text-blue-600 hover:bg-blue-100 font-bold py-3 px-8 rounded-full text-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">Get Started</button>
+    <header class="hero-bg text-white py-32 text-center shadow-2xl overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <h1 class="text-7xl md:text-8xl font-extrabold mb-8 animate-fade-in-down drop-shadow-2xl leading-tight">Elevate Your <span class="text-yellow-300">Coupon</span> Management</h1>
+            <p class="text-2xl md:text-3xl mb-12 opacity-90 animate-fade-in-up max-w-4xl mx-auto font-light">Unlock the full potential of your discount strategies with CouponFlow's intuitive and powerful dashboard.</p>
+            <a href="#create-coupon" class="btn-primary inline-block bg-white text-purple-600 hover:bg-purple-100 font-bold py-5 px-14 rounded-full text-2xl shadow-xl transform hover:scale-105 transition duration-300 ease-in-out animate-scale-in focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50">
+                Start Creating Coupons
+            </a>
         </div>
     </header>
 
-    <main class="container mx-auto mt-12 p-4">
+    <main class="container mx-auto mt-20 p-6">
+        <!-- Global Loading Indicator -->
+        <div class="fixed top-0 left-0 right-0 z-[9999] h-1 bg-gradient-to-r from-purple-500 to-pink-500 htmx-indicator" role="status">
+            <div class="h-full bg-gradient-to-r from-purple-700 to-pink-700 animate-pulse"></div>
+        </div>
+
+        <!-- Dashboard Overview Section -->
+        <section class="mb-20 animate-fade-in-up" style="animation-delay: 0.7s;">
+            <h2 class="text-5xl font-bold text-gray-800 mb-12 text-center dark:text-gray-100">Your Coupon Insights</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-10 border border-gray-100 card-hover dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 text-center transform transition-transform duration-300">
+                    <h3 class="text-3xl font-semibold text-gray-700 mb-6 dark:text-gray-200">Total Coupons</h3>
+                    <p class="text-6xl font-extrabold text-purple-600 drop-shadow-md">125</p>
+                </div>
+                <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-10 border border-gray-100 card-hover dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 text-center transform transition-transform duration-300">
+                    <h3 class="text-3xl font-semibold text-gray-700 mb-6 dark:text-gray-200">Active Coupons</h3>
+                    <p class="text-6xl font-extrabold text-green-500 drop-shadow-md">98</p>
+                </div>
+                <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-10 border border-gray-100 card-hover dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 text-center transform transition-transform duration-300">
+                    <h3 class="text-3xl font-semibold text-gray-700 mb-6 dark:text-gray-200">Expired Coupons</h3>
+                    <p class="text-6xl font-extrabold text-pink-500 drop-shadow-md">27</p>
+                </div>
+            </div>
+        </section>
+
         <!-- Backend Status Section -->
-        <section class="mb-12">
-            <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-100 card-hover transition duration-300">
-                <h2 class="text-3xl font-bold text-gray-700 mb-6 border-b pb-4">Backend Connection Status</h2>
-                <div hx-get="http://localhost:8000/" hx-trigger="load" hx-swap="innerHTML" class="text-gray-600 text-lg">
+        <section class="mb-20 animate-fade-in-up" style="animation-delay: 0.9s;">
+            <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-10 border border-gray-100 card-hover dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
+                <h2 class="text-4xl font-bold text-gray-700 mb-8 border-b-2 pb-4 border-purple-300 dark:text-gray-200 dark:border-purple-700">Backend Connection Status</h2>
+                <div hx-get="http://localhost:8000/" hx-trigger="load" hx-swap="innerHTML" class="text-gray-600 text-xl dark:text-gray-300">
                     <p>Checking backend...</p>
                 </div>
             </div>
         </section>
 
         <!-- Create New Coupon Section -->
-        <section class="mb-12">
-            <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-100 card-hover transition duration-300">
-                <h2 class="text-3xl font-bold text-gray-700 mb-6 border-b pb-4">Create New Coupon</h2>
-                <form hx-post="http://localhost:8000/coupons/" hx-trigger="submit" hx-ext="json-enc" hx-on--after-request="this.reset(); htmx.trigger('#coupon-list-container', 'loadCoupons')" class="space-y-6">
+        <section id="create-coupon" class="mb-20 animate-fade-in-up" style="animation-delay: 1.1s;">
+            <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-10 border border-gray-100 card-hover dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
+                <h2 class="text-4xl font-bold text-gray-700 mb-8 border-b-2 pb-4 border-purple-300 dark:text-gray-200 dark:border-purple-700">Craft a New Coupon</h2>
+                <form hx-post="http://localhost:8000/coupons/" hx-trigger="submit" hx-ext="json-enc" hx-on--after-request="this.reset(); htmx.trigger('#coupon-list-container', 'loadCoupons')" class="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div>
-                        <label for="code" class="block text-gray-700 text-sm font-semibold mb-2">Coupon Code:</label>
-                        <input type="text" id="code" name="code" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="SUMMER2024" required>
+                        <label for="code" class="block text-gray-700 text-xl font-semibold mb-4 dark:text-gray-300">Coupon Code:</label>
+                        <input type="text" id="code" name="code" class="shadow-md appearance-none border border-gray-300 rounded-xl w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none focus:ring-4 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 text-lg" placeholder="SUMMER2024" required>
                     </div>
                     <div>
-                        <label for="discount_type" class="block text-gray-700 text-sm font-semibold mb-2">Discount Type:</label>
-                        <select id="discount_type" name="discount_type" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        <label for="discount_type" class="block text-gray-700 text-xl font-semibold mb-4 dark:text-gray-300">Discount Type:</label>
+                        <select id="discount_type" name="discount_type" class="shadow-md appearance-none border border-gray-300 rounded-xl w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none focus:ring-4 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 text-lg" required>
                             <option value="percentage">Percentage</option>
                             <option value="fixed_amount">Fixed Amount</option>
                         </select>
                     </div>
                     <div>
-                        <label for="discount_value" class="block text-gray-700 text-sm font-semibold mb-2">Discount Value:</label>
-                        <input type="number" id="discount_value" name="discount_value" step="0.01" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="10.00" required>
+                        <label for="discount_value" class="block text-gray-700 text-xl font-semibold mb-4 dark:text-gray-300">Discount Value:</label>
+                        <input type="number" id="discount_value" name="discount_value" step="0.01" class="shadow-md appearance-none border border-gray-300 rounded-xl w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none focus:ring-4 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 text-lg" placeholder="10.00" required>
                     </div>
                     <div>
-                        <label for="valid_until" class="block text-gray-700 text-sm font-semibold mb-2">Valid Until (Optional):</label>
-                        <input type="datetime-local" id="valid_until" name="valid_until" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <label for="valid_until" class="block text-gray-700 text-xl font-semibold mb-4 dark:text-gray-300">Valid Until (Optional):</label>
+                        <input type="datetime-local" id="valid_until" name="valid_until" class="shadow-md appearance-none border border-gray-300 rounded-xl w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none focus:ring-4 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 text-lg">
                     </div>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105">Add Coupon</button>
+                    <div class="md:col-span-2 flex justify-center mt-8">
+                        <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-5 px-16 rounded-full shadow-xl focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 text-2xl tracking-wide">
+                            Add Coupon
+                        </button>
+                    </div>
                 </form>
             </div>
         </section>
 
         <!-- Coupon List Section -->
-        <section>
-            <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-100 card-hover transition duration-300">
-                <h2 class="text-3xl font-bold text-gray-700 mb-6 border-b pb-4">Available Coupons</h2>
+        <section id="coupon-list-section" class="animate-fade-in-up" style="animation-delay: 1.3s;">
+            <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-10 border border-gray-100 card-hover dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
+                <h2 class="text-4xl font-bold text-gray-700 mb-8 border-b-2 pb-4 border-purple-300 dark:text-gray-200 dark:border-purple-700">Your Coupon Inventory</h2>
                 <div id="coupon-list-container" hx-get="http://localhost:8000/coupons/" hx-trigger="load, loadCoupons from body" hx-swap="innerHTML">
-                    <p class="text-gray-600">Loading coupons...</p>
+                    <p class="text-gray-600 dark:text-gray-300 text-xl">Loading coupons...</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="bg-gray-900 text-white text-center p-6 mt-12 shadow-inner">
-        <p class="text-lg">&copy; 2024 CouponFlow. All rights reserved.</p>
-        <p class="text-sm mt-2">Designed with <span class="text-red-500">&hearts;</span> by Your Team</p>
+    <footer class="bg-gray-900 text-white text-center p-10 mt-24 shadow-inner dark:bg-gray-950">
+        <p class="text-2xl mb-3 font-semibold">&copy; 2024 CouponFlow. All rights reserved.</p>
+        <p class="text-lg opacity-80">Crafted with <span class="text-pink-500">&hearts;</span> for a seamless experience.</p>
+        <div class="flex justify-center space-x-6 mt-6">
+            <a href="#" class="text-gray-400 hover:text-white transition duration-300"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.83 9.504.499.09.679-.217.679-.481 0-.237-.008-.862-.013-1.698-2.782.602-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.618.069-.606.069-.606 1.003.07 1.531 1.032 1.531 1.032.892 1.529 2.341 1.084 2.91.829.091-.645.356-1.084.654-1.33-2.22-.253-4.555-1.113-4.555-4.93 0-1.091.39-1.984 1.029-2.682-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.025A9.428 9.428 0 0112 6.844c.85.004 1.7.117 2.49.386 1.909-1.296 2.747-1.025 2.747-1.025.546 1.379.202 2.398.099 2.651.64.699 1.029 1.591 1.029 2.682 0 3.823-2.339 4.67-4.566 4.922.357.307.678.915.678 1.846 0 1.33-.012 2.41-.012 2.746 0 .266.18.593.687.48C21.137 20.188 24 16.42 24 12.017 24 6.484 19.522 2 14 2h-2z" clip-rule="evenodd" /></svg></a>
+            <a href="#" class="text-gray-400 hover:text-white transition duration-300"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.007-.533A8.349 8.349 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.22 8.22 0 01-2.606.996 4.109 4.109 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.109 4.109 0 001.27 5.477A4.072 4.072 0 012 10.772v.058a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg></a>
+            <a href="#" class="text-gray-400 hover:text-white transition duration-300"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.776-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33V22H12c5.523 0 10-4.477 10-10z" clip-rule="evenodd" /></svg></a>
+        </div>
     </footer>
+
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+        // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+            darkIcon.classList.remove('hidden');
+            lightIcon.classList.add('hidden');
+        } else {
+            htmlElement.classList.remove('dark');
+            darkIcon.classList.add('hidden');
+            lightIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.theme = 'light';
+                darkIcon.classList.add('hidden');
+                lightIcon.classList.remove('hidden');
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.theme = 'dark';
+                darkIcon.classList.remove('hidden');
+                lightIcon.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 </html>

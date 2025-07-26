@@ -10,14 +10,17 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Install http-server globally (or as a dev dependency if preferred)
+# Install http-server globally
 RUN npm install -g http-server
 
-# Copy project
+# Copy project files
 COPY . . 
+
+# Build Tailwind CSS
+RUN npx tailwindcss -i ./src/input.css -o ./dist/output.css --config tailwind.config.js --minify
 
 # Expose port
 EXPOSE 3000
 
-# Start the server
-CMD ["npm", "run", "dev"]
+# Start the HTTP server
+CMD npm run start
